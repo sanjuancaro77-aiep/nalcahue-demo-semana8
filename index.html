@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NalcahueCommunity — Demo Accesibilidad · Áreas Comunes</title>
+<style>
+  :root{
+    --bg-app:      #0E1220;
+    --bg-topbar:   #14171F;
+    --bg-card:     #171C2E;
+    --bg-card2:    #1C2340;
+    --border:      #262C42;
+    --azul:        #4C6FE0;
+    --azul-suave:  rgba(76,111,224,.15);
+    --verde:       #22C55E;
+    --verde-suave: rgba(34,197,94,.14);
+    --ambar:       #F5A524;
+    --ambar-suave: rgba(245,165,36,.14);
+    --rojo:        #F04438;
+    --rojo-suave:  rgba(240,68,56,.14);
+    --txt:         #FFFFFF;
+    --txt-sec:     #94A0B8;
+    --txt-ter:     #5B6478;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:'Segoe UI', Arial, sans-serif; background:#050609; margin:0; padding:24px; color:var(--txt); display:flex; justify-content:center;}
+
+  /* ===== Marco móvil ===== */
+  .phone{width:390px;background:var(--bg-app);border-radius:28px;overflow:hidden;box-shadow:0 0 0 8px #000, 0 20px 40px rgba(0,0,0,.5);display:flex;flex-direction:column;min-height:750px;}
+  .phone .topbar{background:var(--bg-topbar);padding:12px 18px;font-size:12px;color:var(--txt-sec);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .phone .content{padding:18px 18px 90px;flex:1;overflow-y:auto;}
+  .step-indicator{position:fixed;top:8px;left:50%;transform:translateX(-50%);background:var(--azul);color:#fff;font-size:11px;font-weight:600;padding:5px 14px;border-radius:20px;z-index:99;letter-spacing:.2px;}
+
+  .screen{display:none;animation:fadeIn .25s ease;}
+  .screen.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  .header-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+  .back-arrow{background:none;border:none;color:var(--txt);font-size:18px;padding:4px;cursor:pointer;}
+  .header-row h2{margin:0;color:var(--txt);font-weight:700;font-size:17px;flex:1;text-align:center;}
+  .fab{width:34px;height:34px;border-radius:50%;background:var(--azul);border:none;color:#fff;font-size:18px;cursor:pointer;}
+
+  h2{margin:0 0 6px;color:var(--txt);font-weight:700;font-size:19px;}
+  .greeting-sub{color:var(--txt-sec);font-size:13px;margin-bottom:16px;}
+
+  .banner{background:linear-gradient(135deg,var(--azul),#3856B8);border-radius:14px;padding:16px;margin-bottom:20px;}
+  .banner .titulo{font-weight:700;font-size:14px;margin-bottom:2px;}
+  .banner .sub{font-size:12px;color:#DCE3FA;}
+
+  .section-label{font-size:12px;color:var(--txt-sec);font-weight:600;margin:18px 0 10px;text-transform:uppercase;letter-spacing:.3px;}
+
+  /* Home: grid módulos */
+  .modulos{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .modulo-card{position:relative;border:1px solid var(--border);border-radius:14px;padding:16px 12px;background:var(--bg-card);color:var(--txt-sec);font-size:13px;font-weight:600;}
+  .modulo-card.activo{cursor:pointer;color:var(--txt);}
+  .modulo-card.activo:hover, .modulo-card.activo:focus-visible{background:var(--bg-card2);}
+  .modulo-card .icono{font-size:20px;display:block;margin-bottom:8px;}
+  .pill-nuevo{position:absolute;top:10px;right:10px;background:var(--azul);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;}
+
+  button{cursor:pointer;font-family:inherit;}
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+    outline: 3px solid #7EA0FF;
+    outline-offset: 2px;
+    border-radius: 10px;
+  }
+
+  label{display:block;font-size:11px;font-weight:700;color:var(--txt-sec);margin-top:18px;letter-spacing:.3px;text-transform:uppercase;}
+  label .opcional{float:right;font-weight:400;color:var(--txt-ter);text-transform:none;}
+  select, input, textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;margin-top:6px;font-size:14px;color:var(--txt);font-family:inherit;background:var(--bg-card);}
+  textarea::placeholder, input::placeholder{color:var(--txt-ter);}
+  .hint-areas{font-size:11px;color:var(--txt-ter);margin-top:6px;}
+
+  /* Calendario */
+  .calendar{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:6px;}
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .cal-head span{font-weight:700;font-size:13px;}
+  .cal-head button{background:none;border:none;color:var(--txt-sec);font-size:14px;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;font-size:11px;}
+  .cal-grid .dow{color:var(--txt-ter);font-weight:600;padding-bottom:4px;}
+  .cal-grid .day{padding:7px 0;border-radius:8px;color:var(--txt-sec);}
+  .cal-grid .day.selected{background:var(--azul);color:#fff;font-weight:700;}
+  .cal-grid .day.disabled{color:var(--rojo);opacity:.55;}
+
+  .chip-row{display:flex;gap:8px;margin-top:6px;}
+  .chip{flex:1;text-align:center;padding:10px 4px;border-radius:10px;border:1px solid var(--border);background:var(--bg-card);color:var(--txt-sec);font-size:12.5px;font-weight:600;}
+  .chip.selected{background:var(--azul-suave);border-color:var(--azul);color:#fff;}
+
+  .stepper{display:flex;align-items:center;justify-content:space-between;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:8px 14px;margin-top:6px;}
+  .stepper button{width:30px;height:30px;border-radius:50%;border:none;background:var(--bg-card2);color:var(--txt);font-size:16px;font-weight:700;}
+  .stepper button.plus{background:var(--azul);}
+  .stepper .num{font-weight:700;font-size:15px;}
+
+  .toggle-row{display:flex;align-items:center;gap:10px;margin-top:18px;}
+  .switch{width:40px;height:22px;border-radius:20px;background:var(--verde);position:relative;flex-shrink:0;}
+  .switch::after{content:'';position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:#fff;}
+  .toggle-row span{font-size:12.5px;color:var(--txt-sec);}
+
+  button.primary{
+    width:100%;margin-top:22px;padding:15px;border:none;border-radius:26px;
+    background:linear-gradient(135deg,var(--azul),#3856B8);color:#fff;font-size:15px;font-weight:bold;
+    transition:opacity .15s, transform .15s;
+  }
+  button.primary:hover{opacity:.9;transform:translateY(-1px);}
+  button.secondary{
+    width:100%;margin-top:10px;padding:12px;border:1px solid var(--border);border-radius:12px;
+    background:var(--bg-card);color:var(--txt);font-size:13.5px;font-weight:600;
+  }
+
+  /* Reserva items */
+  .reserva-item{display:flex;gap:12px;border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;background:var(--bg-card);align-items:flex-start;}
+  .reserva-item .icon-box{width:38px;height:38px;border-radius:10px;background:var(--bg-card2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+  .reserva-item .info{flex:1;}
+  .reserva-item .area{font-weight:700;color:var(--txt);font-size:13.5px;}
+  .reserva-item p{font-size:11.5px;color:var(--txt-sec);margin:3px 0 0;}
+  .estado-pill{display:inline-block;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid;white-space:nowrap;}
+  .estado-pendiente{background:var(--ambar-suave);color:var(--ambar);border-color:var(--ambar);}
+  .estado-aprobada{background:var(--verde-suave);color:var(--verde);border-color:var(--verde);}
+  .estado-confirmada{background:var(--verde-suave);color:var(--verde);border-color:var(--verde);}
+  .estado-rechazada{background:var(--rojo-suave);color:var(--rojo);border-color:var(--rojo);}
+  .estado-pill.solido.estado-pendiente{background:var(--ambar);color:#3A2400;border-color:var(--ambar);}
+  .estado-pill.solido.estado-aprobada, .estado-pill.solido.estado-confirmada{background:var(--verde);color:#06280F;border-color:var(--verde);}
+  .estado-pill.solido.estado-rechazada{background:var(--rojo);color:#3A0906;border-color:var(--rojo);}
+
+  .banner-ok{background:var(--verde-suave);color:var(--verde);border:1px solid var(--verde);border-radius:10px;padding:12px 14px;font-size:12.5px;margin-bottom:16px;display:none;}
+  .banner-ok.show{display:block;}
+
+  /* Bottom nav */
+  .bottom-nav{position:absolute;bottom:0;left:0;right:0;background:var(--bg-topbar);border-top:1px solid var(--border);display:flex;padding:10px 6px;}
+  .bottom-nav .item{flex:1;text-align:center;font-size:9.5px;color:var(--txt-ter);}
+  .bottom-nav .item.active{color:var(--azul);}
+  .bottom-nav .item .ic{display:block;font-size:16px;margin-bottom:2px;}
+  .phone{position:relative;}
+
+  /* ===== Layout escritorio (Admin) ===== */
+  .desktop{display:none;width:100%;max-width:1180px;background:#0B0E17;border-radius:14px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.55);}
+  .desktop.active{display:flex;}
+  .sidebar{width:220px;background:#0F1220;border-right:1px solid var(--border);padding:18px 0;flex-shrink:0;}
+  .sidebar .brand{display:flex;align-items:center;gap:10px;padding:0 18px 18px;border-bottom:1px solid var(--border);margin-bottom:14px;}
+  .sidebar .brand .sq{width:30px;height:30px;border-radius:8px;background:var(--azul);}
+  .sidebar .brand div strong{display:block;font-size:13px;}
+  .sidebar .brand div span{font-size:10.5px;color:var(--txt-ter);}
+  .sidebar .grupo{font-size:10px;color:var(--txt-ter);text-transform:uppercase;letter-spacing:.4px;padding:10px 18px 6px;font-weight:700;}
+  .sidebar .item{display:flex;align-items:center;gap:10px;padding:9px 18px;font-size:12.5px;color:var(--txt-sec);border-left:3px solid transparent;}
+  .sidebar .item.active{background:var(--azul-suave);color:#fff;border-left-color:var(--azul);font-weight:600;}
+
+  .desk-main{flex:1;padding:22px 26px;min-width:0;}
+  .desk-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+  .breadcrumb{font-size:11.5px;color:var(--txt-ter);}
+  .breadcrumb b{color:var(--txt-sec);}
+  .desk-title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;}
+  .desk-title-row h2{font-size:22px;}
+  .desk-title-row p{color:var(--txt-sec);font-size:12.5px;margin:4px 0 0;}
+  .btn-amber{background:var(--ambar);color:#3A2400;border:none;border-radius:9px;padding:11px 16px;font-size:12.5px;font-weight:700;}
+
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+  .kpi{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+  .kpi .num{font-size:20px;font-weight:800;}
+  .kpi .lbl{font-size:11px;color:var(--txt-sec);margin-top:2px;}
+  .kpi.blue .num{color:var(--azul);} .kpi.green .num{color:var(--verde);} .kpi.amber .num{color:var(--ambar);} .kpi.red .num{color:var(--rojo);}
+
+  .search-row{display:flex;gap:10px;margin-bottom:16px;}
+  .search-row input, .search-row select{background:var(--bg-card);border:1px solid var(--border);color:var(--txt);border-radius:9px;padding:10px 12px;font-size:12.5px;}
+  .search-row input{flex:1;}
+  .btn-blue-sm{background:var(--azul);color:#fff;border:none;border-radius:9px;padding:10px 18px;font-size:12.5px;font-weight:700;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  thead tr{border-bottom:1px solid var(--border);}
+  thead th{padding:10px 10px;text-align:left;font-weight:700;font-size:10.5px;color:var(--txt-ter);text-transform:uppercase;letter-spacing:.3px;}
+  tbody tr{border-bottom:1px solid var(--border);}
+  tbody tr.fila-pendiente{cursor:pointer;}
+  tbody tr.fila-pendiente:hover, tbody tr.fila-pendiente:focus-visible{background:var(--bg-card);outline:none;}
+  td{padding:12px 10px;vertical-align:middle;color:var(--txt-sec);}
+  td.area-cell{color:var(--txt);font-weight:600;}
+  .accion-link{background:none;border:none;font-size:12px;font-weight:700;margin-right:12px;padding:2px;}
+  .accion-link.aprobar{color:var(--verde);}
+  .accion-link.rechazar{color:var(--ambar);}
+  .accion-link.eliminar{color:var(--rojo);}
+  .caption{font-size:11px;color:var(--txt-ter);margin-top:10px;font-style:italic;}
+
+  /* Modal */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;align-items:center;justify-content:center;padding:16px;}
+  .overlay.active{display:flex;}
+  .modal-box{background:var(--bg-card2);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:420px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.5);}
+  .modal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .modal-top h2{font-size:16px;}
+  .modal-close{background:none;border:none;color:var(--txt-sec);font-size:16px;}
+  .info label{margin-top:14px;}
+  .info .val{color:var(--txt);font-size:13.5px;font-weight:600;margin-top:2px;}
+  .obs-box{background:var(--bg-app);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-top:6px;font-size:12.5px;color:var(--txt-sec);}
+
+  .modal-actions{display:flex;gap:10px;margin-top:22px;}
+  .btn-wrap{position:relative;flex:1;}
+  .badge{
+    position:absolute;top:-9px;left:-9px;width:20px;height:20px;border-radius:50%;
+    background:var(--azul);color:#fff;font-size:11px;font-weight:bold;
+    display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:2;
+    box-shadow:0 0 0 2px var(--bg-card2);
+  }
+  .modal-actions button{width:100%;padding:11px;border-radius:10px;border:none;font-weight:bold;font-size:13px;transition:opacity .15s, transform .15s;}
+  .modal-actions button:hover{opacity:.88;transform:translateY(-1px);}
+  .btn-aprobar{background:var(--verde);color:#06280F;}
+  .btn-rechazar{background:var(--rojo);color:#3A0906;}
+  .btn-cancelar{background:transparent;color:var(--txt-sec);border:1px solid var(--border) !important;}
+
+  .ripple{position:fixed;border:2px solid var(--azul);border-radius:50%;width:20px;height:20px;
+    pointer-events:none;transform:translate(-50%,-50%);animation:ripple-anim .6s ease-out forwards;z-index:9999;}
+  @keyframes ripple-anim{from{opacity:1;width:20px;height:20px;}to{opacity:0;width:60px;height:60px;}}
+</style>
+</head>
+<body>
+
+<div class="step-indicator" id="stepIndicator">Paso 1 de 6 — Acceso</div>
+
+<!-- ===== TELÉFONO (Login / Home / Nueva Reserva / Mis Reservas) ===== -->
+<div class="phone" id="phoneShell">
+  <div class="topbar"><span>NalcahueCommunity - Áreas Comunes</span><span>⌄</span></div>
+  <div class="content">
+
+    <!-- 1. LOGIN -->
+    <div class="screen active" id="screen-login">
+      <h2 style="margin-top:30px;">Acceso vecino</h2>
+      <p class="greeting-sub">Ingresa con tu N.° de casa y el token asignado por administración.</p>
+      <label for="casa">N.° de casa</label>
+      <input type="text" id="casa" placeholder="Ej: 24" value="24">
+      <label for="token">Token de acceso</label>
+      <input type="text" id="token" placeholder="Ej: NLC-8842" value="NLC-8842">
+      <button class="primary" onclick="goTo('login',2)">Ingresar</button>
+    </div>
+
+    <!-- 2. HOME -->
+    <div class="screen" id="screen-home">
+      <h2>Hola, Juan <span aria-hidden="true">👋</span></h2>
+      <p class="greeting-sub">Casa 24</p>
+      <div class="banner">
+        <div class="titulo">🏠 Tu comunidad en un solo lugar</div>
+        <div class="sub">Gestiona visitas, mascotas y espacios comunes</div>
+      </div>
+      <div class="section-label">¿Qué necesitas?</div>
+      <div class="modulos">
+        <div class="modulo-card"><span class="icono">📋</span>Registrar Visita</div>
+        <div class="modulo-card"><span class="icono">🔔</span>Botón de Alerta</div>
+        <div class="modulo-card"><span class="icono">🐾</span>Mis Mascotas</div>
+        <div class="modulo-card"><span class="icono">📖</span>Reglamento</div>
+        <div class="modulo-card"><span class="icono">🔧</span>Servicios</div>
+        <div class="modulo-card"><span class="icono">🚨</span>Emergencias</div>
+        <div class="modulo-card activo" tabindex="0" role="button"
+             aria-label="Ir a Áreas Comunes, reservar espacios del condominio"
+             onclick="goTo('nueva-reserva', 3)"
+             onkeydown="if(event.key==='Enter'){goTo('nueva-reserva', 3)}">
+          <span class="pill-nuevo">NUEVO</span>
+          <span class="icono">🔑</span>Áreas Comunes
+        </div>
+        <div class="modulo-card"><span class="icono">🗞️</span>Noticias</div>
+      </div>
+    </div>
+
+    <!-- 3. NUEVA RESERVA -->
+    <div class="screen" id="screen-nueva-reserva">
+      <div class="header-row">
+        <button class="back-arrow" onclick="goTo('home',2)" aria-label="Volver">←</button>
+        <h2>Nueva Reserva</h2>
+        <span style="width:26px;"></span>
+      </div>
+
+      <label for="area">Área</label>
+      <select id="area">
+        <option>Quincho</option>
+        <option>Piscina</option>
+        <option>Sala Multiuso</option>
+      </select>
+      <div class="hint-areas">Quincho • Sala Multiuso • Estacionamiento de Visitas • Piscina</div>
+
+      <label for="fecha">Fecha</label>
+      <div class="calendar">
+        <div class="cal-head"><button aria-hidden="true">‹</button><span>Julio 2026</span><button aria-hidden="true">›</button></div>
+        <div class="cal-grid">
+          <div class="dow">Lu</div><div class="dow">Ma</div><div class="dow">Mi</div><div class="dow">Ju</div><div class="dow">Vi</div><div class="dow">Sa</div><div class="dow">Do</div>
+          <div></div><div class="day">1</div><div class="day">2</div><div class="day">3</div><div class="day">4</div><div class="day">5</div><div class="day">6</div>
+          <div class="day">7</div><div class="day disabled">8</div><div class="day">9</div><div class="day">10</div><div class="day">11</div><div class="day">12</div><div class="day">13</div>
+          <div class="day">14</div><div class="day selected">15</div><div class="day disabled">16</div><div class="day">17</div><div class="day">18</div><div class="day">19</div><div class="day disabled">20</div>
+          <div class="day">21</div><div class="day">22</div><div class="day">23</div><div class="day">24</div><div class="day">25</div><div class="day">26</div><div class="day">27</div>
+        </div>
+        <input type="hidden" id="fecha" value="2026-07-15">
+      </div>
+
+      <label>Horario</label>
+      <div class="chip-row" role="radiogroup" aria-label="Horario de reserva">
+        <div class="chip selected" tabindex="0" role="radio" aria-checked="true" onclick="seleccionarChip(this,'horario')">12:00–16:00</div>
+        <div class="chip" tabindex="0" role="radio" aria-checked="false" onclick="seleccionarChip(this,'horario')">16:00–20:00</div>
+        <div class="chip" tabindex="0" role="radio" aria-checked="false" onclick="seleccionarChip(this,'horario')">20:00–00:00</div>
+      </div>
+      <input type="hidden" id="horario" value="12:00–16:00">
+
+      <label>Cantidad de invitados <span class="opcional">máx. 30</span></label>
+      <div class="stepper">
+        <button type="button" aria-label="Restar invitado" onclick="sumarInvitados(-1)">−</button>
+        <span class="num" id="numInvitados">12</span>
+        <button type="button" class="plus" aria-label="Sumar invitado" onclick="sumarInvitados(1)">+</button>
+      </div>
+
+      <label for="obs">Observaciones <span class="opcional">Opcional</span></label>
+      <textarea id="obs" rows="2" placeholder="Ej: Cumpleaños familiar, necesito música hasta las 23:00..."></textarea>
+
+      <div class="toggle-row">
+        <div class="switch" role="checkbox" aria-checked="true" tabindex="0"></div>
+        <span>Acepto el reglamento de uso del espacio</span>
+      </div>
+
+      <button class="primary" id="btnReservar" onclick="confirmarReserva()">Reservar Espacio</button>
+    </div>
+
+    <!-- 4. MIS RESERVAS -->
+    <div class="screen" id="screen-mis-reservas">
+      <div class="header-row">
+        <button class="back-arrow" onclick="goTo('home',2)" aria-label="Volver">←</button>
+        <h2>Mis Reservas</h2>
+        <button class="fab" aria-label="Nueva reserva" onclick="goTo('nueva-reserva',3)">+</button>
+      </div>
+      <div class="banner-ok" id="bannerVecino"></div>
+
+      <div class="section-label">Próximas</div>
+      <div class="reserva-item">
+        <div class="icon-box">🏖️</div>
+        <div class="info">
+          <span class="area">Quincho</span>
+          <p>📅 Sáb 15 Jul 2026 · 🕒 16:00–20:00 · 👥 18 invitados</p>
+        </div>
+        <span class="estado-pill estado-confirmada">Confirmada</span>
+      </div>
+      <div class="reserva-item" id="itemReservaNueva" style="display:none;">
+        <div class="icon-box">🎉</div>
+        <div class="info">
+          <span class="area" id="areaNueva">Piscina</span>
+          <p id="detalleNueva">📅 Dom 20 Jul 2026 · 🕒 12:00–16:00 · 👥 12 invitados</p>
+        </div>
+        <span class="estado-pill estado-pendiente" id="pillNueva">Pendiente</span>
+      </div>
+
+      <div class="section-label">Historial</div>
+      <div class="reserva-item">
+        <div class="icon-box">🅿️</div>
+        <div class="info">
+          <span class="area">Estacionamiento Visitas</span>
+          <p>📅 Sáb 04 Jul 2026 · 🕒 20:00–00:00 · 👥 5 invitados</p>
+        </div>
+        <span class="estado-pill estado-rechazada">Rechazada</span>
+      </div>
+
+      <button class="secondary" onclick="goTo('admin-areas',5)">Ver como administrador →</button>
+    </div>
+
+  </div>
+  <div class="bottom-nav">
+    <div class="item active"><span class="ic">🏠</span>Inicio</div>
+    <div class="item"><span class="ic">👤</span>Visitas</div>
+    <div class="item"><span class="ic">🚨</span>Alerta</div>
+    <div class="item"><span class="ic">🗞️</span>Noticias</div>
+    <div class="item"><span class="ic">👤</span>Perfil</div>
+  </div>
+</div>
+
+<!-- ===== ESCRITORIO (Admin) ===== -->
+<div class="desktop" id="screen-admin-areas">
+  <div class="sidebar">
+    <div class="brand"><div class="sq"></div><div><strong>Nalcahue</strong><span>Panel Admin</span></div></div>
+    <div class="grupo">Principal</div>
+    <div class="item">📊 Dashboard</div>
+    <div class="item">📈 Actividad</div>
+    <div class="grupo">Administración</div>
+    <div class="item">🏢 Condominios</div>
+    <div class="item">🏠 Casas</div>
+    <div class="item">👤 Residentes</div>
+    <div class="item">🚗 Vehículos</div>
+    <div class="grupo">Comunidad</div>
+    <div class="item">🐾 Mascotas</div>
+    <div class="item active">🔑 Áreas Comunes</div>
+    <div class="item">🔧 Servicios</div>
+    <div class="grupo">Seguridad</div>
+    <div class="item">🔔 Alertas</div>
+    <div class="item">📋 Visitas</div>
+    <div class="grupo">Comunicación</div>
+    <div class="item">🗞️ Noticias</div>
+    <div class="grupo">Informes</div>
+    <div class="item">📑 Reportes</div>
+  </div>
+  <div class="desk-main">
+    <div class="desk-top">
+      <div class="breadcrumb">Comunidad / <b>Áreas Comunes</b><br>Condominio Nalcahue</div>
+      <button class="back-arrow" style="color:var(--txt-sec);" onclick="goTo('mis-reservas',4)">← Volver a vista vecino</button>
+    </div>
+    <div class="desk-title-row">
+      <div><h2>Áreas Comunes</h2><p>Gestiona reservas y espacios disponibles del condominio</p></div>
+      <button class="btn-amber">+ Nueva Área</button>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi blue"><div class="num">4</div><div class="lbl">Total Áreas</div></div>
+      <div class="kpi green"><div class="num">12</div><div class="lbl">Confirmadas</div></div>
+      <div class="kpi amber"><div class="num" id="kpiPendientes">5</div><div class="lbl">Pendientes</div></div>
+      <div class="kpi red"><div class="num">2</div><div class="lbl">Rechazadas</div></div>
+    </div>
+    <div class="search-row">
+      <input type="text" placeholder="Buscar área, vecino o casa...">
+      <select><option>Estado: Todas</option></select>
+      <button class="btn-blue-sm">Buscar</button>
+    </div>
+    <table>
+      <thead><tr><th>Área</th><th>Fecha</th><th>Horario</th><th>Vecino / Casa</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>
+        <tr class="fila-pendiente" tabindex="0" role="button"
+            aria-label="Abrir detalle de la reserva pendiente de Juan Pérez, Piscina"
+            onclick="abrirModal()" onkeydown="if(event.key==='Enter'){abrirModal()}">
+          <td class="area-cell" id="adminArea">Piscina</td><td>Dom 20 Jul 2026</td><td>12:00–16:00</td><td>Juan Pérez / Casa 24</td>
+          <td><span class="estado-pill solido estado-pendiente" id="adminPill">Pendiente</span></td>
+          <td><button class="accion-link aprobar" onclick="event.stopPropagation();abrirModal()">Aprobar</button><button class="accion-link rechazar" onclick="event.stopPropagation();abrirModal()">Rechazar</button><button class="accion-link eliminar">Eliminar</button></td>
+        </tr>
+        <tr>
+          <td class="area-cell">Sala Multiuso</td><td>Dom 20 Jul 2026</td><td>12:00–16:00</td><td>Ana López / Casa 7</td>
+          <td><span class="estado-pill solido estado-confirmada">Confirmada</span></td>
+          <td><button class="accion-link aprobar">Aprobar</button><button class="accion-link rechazar">Rechazar</button><button class="accion-link eliminar">Eliminar</button></td>
+        </tr>
+        <tr>
+          <td class="area-cell">Estac. Visitas</td><td>Vie 04 Jul 2026</td><td>20:00–00:00</td><td>María Fuentes / Casa 18</td>
+          <td><span class="estado-pill solido estado-rechazada">Rechazada</span></td>
+          <td><button class="accion-link aprobar">Aprobar</button><button class="accion-link rechazar">Rechazar</button><button class="accion-link eliminar">Eliminar</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="caption">Tabla de administración, módulo Gestión de Áreas Comunes. Elaboración propia, 2026.</p>
+  </div>
+</div>
+
+<!-- MODAL DETALLE DE RESERVA -->
+<div class="overlay" id="overlayModal">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+    <div class="modal-top">
+      <h2 id="modalTitulo">Detalle de Reserva</h2>
+      <button class="modal-close" onclick="cerrarModal()" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="info">
+      <span class="estado-pill solido estado-pendiente">Pendiente</span>
+      <label>Vecino</label><div class="val">Juan Pérez — Casa 24</div>
+      <label>Área solicitada</label><div class="val" id="modalArea">Piscina</div>
+      <label>Fecha y horario</label><div class="val">Domingo 20 Jul 2026, 12:00–16:00</div>
+      <label>Cantidad de invitados</label><div class="val" id="modalInvitados">12 invitados</div>
+      <label>Observaciones del vecino</label>
+      <div class="obs-box">Reunión de comunidad, necesitamos las mesas y sillas dispuestas en U. Por favor confirmar si el proyector está disponible.</div>
+    </div>
+    <div class="modal-actions">
+      <div class="btn-wrap"><span class="badge">1</span><button class="btn-aprobar" tabindex="1" onclick="resolverReserva('Aprobada')">▲ Aprobar</button></div>
+      <div class="btn-wrap"><span class="badge">2</span><button class="btn-rechazar" tabindex="2" onclick="resolverReserva('Rechazada')">✕ Rechazar</button></div>
+      <div class="btn-wrap"><span class="badge">3</span><button class="btn-cancelar" tabindex="3" onclick="cerrarModal()">Cancelar</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const stepNames = {1:'Acceso',2:'Inicio',3:'Nueva Reserva',4:'Mis Reservas',5:'Administración'};
+  let reservaData = { area:'Piscina', horario:'12:00–16:00', invitados:12, estado:'Pendiente' };
+
+  function goTo(screenId, step){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('phoneShell').style.display = (step===5) ? 'none' : 'flex';
+    document.getElementById('screen-admin-areas').classList.remove('active');
+
+    if(step===5){
+      document.getElementById('screen-admin-areas').classList.add('active');
+    } else {
+      document.getElementById('screen-'+screenId).classList.add('active');
+    }
+    document.getElementById('stepIndicator').textContent = 'Paso '+step+' de 6 — '+stepNames[step];
+  }
+
+  function seleccionarChip(el, hiddenId){
+    el.parentElement.querySelectorAll('.chip').forEach(c=>{c.classList.remove('selected');c.setAttribute('aria-checked','false');});
+    el.classList.add('selected');
+    el.setAttribute('aria-checked','true');
+    document.getElementById(hiddenId).value = el.textContent;
+  }
+
+  function sumarInvitados(delta){
+    const el = document.getElementById('numInvitados');
+    let val = parseInt(el.textContent) + delta;
+    if(val < 1) val = 1;
+    if(val > 30) val = 30;
+    el.textContent = val;
+  }
+
+  function updateAriaLabel(){
+    const area = document.getElementById('area').value;
+    const horario = document.getElementById('horario').value;
+    document.getElementById('btnReservar')
+      .setAttribute('aria-label', `Confirmar reserva de ${area}, 15 de julio 2026, ${horario}`);
+  }
+  document.getElementById('area').addEventListener('change', updateAriaLabel);
+  updateAriaLabel();
+
+  function confirmarReserva(){
+    reservaData.area = document.getElementById('area').value;
+    reservaData.horario = document.getElementById('horario').value;
+    reservaData.invitados = document.getElementById('numInvitados').textContent;
+    reservaData.estado = 'Pendiente';
+
+    document.getElementById('areaNueva').textContent = reservaData.area;
+    document.getElementById('detalleNueva').textContent = `📅 Dom 20 Jul 2026 · 🕒 ${reservaData.horario} · 👥 ${reservaData.invitados} invitados`;
+    document.getElementById('itemReservaNueva').style.display = 'flex';
+    document.getElementById('modalArea').textContent = reservaData.area;
+    document.getElementById('modalInvitados').textContent = reservaData.invitados + ' invitados';
+    document.getElementById('adminArea').textContent = reservaData.area;
+
+    const banner = document.getElementById('bannerVecino');
+    banner.textContent = 'Tu solicitud fue enviada y quedó en estado Pendiente.';
+    banner.className = 'banner-ok show';
+
+    goTo('mis-reservas', 4);
+  }
+
+  function abrirModal(){
+    document.getElementById('overlayModal').classList.add('active');
+    document.querySelector('#overlayModal .btn-aprobar').focus();
+  }
+  function cerrarModal(){
+    document.getElementById('overlayModal').classList.remove('active');
+  }
+  function resolverReserva(estado){
+    reservaData.estado = estado;
+    const clase = estado === 'Aprobada' ? 'estado-aprobada' : 'estado-rechazada';
+
+    const adminPill = document.getElementById('adminPill');
+    adminPill.textContent = estado;
+    adminPill.className = 'estado-pill solido '+clase;
+
+    const pillNueva = document.getElementById('pillNueva');
+    pillNueva.textContent = estado;
+    pillNueva.className = 'estado-pill '+clase;
+
+    const banner = document.getElementById('bannerVecino');
+    banner.textContent = estado === 'Aprobada'
+      ? 'Buenas noticias: tu reserva fue Aprobada por administración.'
+      : 'Tu solicitud fue Rechazada por administración.';
+    banner.className = 'banner-ok show';
+
+    cerrarModal();
+    goTo('mis-reservas', 4);
+  }
+
+  document.addEventListener('click', function(e){
+    const r = document.createElement('div');
+    r.className = 'ripple';
+    r.style.left = e.clientX + 'px';
+    r.style.top = e.clientY + 'px';
+    document.body.appendChild(r);
+    setTimeout(()=> r.remove(), 600);
+  });
+</script>
+</body>
+</html>
