@@ -245,6 +245,20 @@
   .ripple{position:fixed;border:2px solid var(--azul);border-radius:50%;width:20px;height:20px;
     pointer-events:none;transform:translate(-50%,-50%);animation:ripple-anim .6s ease-out forwards;z-index:9999;}
   @keyframes ripple-anim{from{opacity:1;width:20px;height:20px;}to{opacity:0;width:60px;height:60px;}}
+
+  /* ===== SEMANA 8: Guía de revisión para el docente ===== */
+  .overlay-guia{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:16px;}
+  .overlay-guia.active{display:flex;}
+  .guia-box{background:var(--bg-card2);border:1px solid var(--border);border-radius:16px;padding:26px;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.6);}
+  .guia-box h2{font-size:17px;margin-bottom:4px;}
+  .guia-box .sub{font-size:12.5px;color:var(--txt-sec);margin-bottom:16px;}
+  .guia-paso{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start;}
+  .guia-paso .n{width:24px;height:24px;border-radius:50%;background:var(--azul);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .guia-paso p{margin:0;font-size:12.5px;color:var(--txt-sec);line-height:1.5;}
+  .guia-paso p b{color:var(--txt);}
+  .guia-paso p .tip{color:var(--ambar);font-weight:600;}
+  .btn-guia-flotante{position:fixed;bottom:22px;right:22px;width:46px;height:46px;border-radius:50%;background:var(--azul);color:#fff;border:none;font-size:20px;font-weight:700;z-index:150;box-shadow:0 6px 18px rgba(0,0,0,.45);}
+  .btn-guia-flotante:hover{transform:translateY(-2px);}
 </style>
 </head>
 <body>
@@ -575,6 +589,26 @@
   </div>
 </div>
 
+<!-- ===== SEMANA 8: GUÍA DE REVISIÓN (se muestra al abrir la demo) ===== -->
+<div class="overlay-guia active" id="overlayGuia">
+  <div class="guia-box" role="dialog" aria-modal="true" aria-labelledby="guiaTitulo">
+    <h2 id="guiaTitulo">🧭 Guía de revisión — Semana 8</h2>
+    <p class="sub">Diseño de entrada y salida de interfaz · Módulo Gestión de Áreas Comunes. Recorrido sugerido de 7 pasos:</p>
+
+    <div class="guia-paso"><span class="n">1</span><p><b>Acceso.</b> <span class="tip">Para ver la validación de entrada:</span> borra el token o escribe uno inválido (ej. "1234") y haz clic fuera del campo. El error aparece al instante. Luego escribe NLC-8842 e Ingresar.</p></div>
+    <div class="guia-paso"><span class="n">2</span><p><b>Inicio.</b> Entra al módulo <b>Áreas Comunes</b> (tarjeta con etiqueta NUEVO).</p></div>
+    <div class="guia-paso"><span class="n">3</span><p><b>Nueva Reserva.</b> <span class="tip">Para ver la validación al enviar:</span> pulsa "Reservar Espacio" sin aceptar el reglamento. Después activa el interruptor y vuelve a reservar.</p></div>
+    <div class="guia-paso"><span class="n">4</span><p><b>Confirmación de Reserva</b> (salida nueva de esta semana): revisa el N.° de folio y el resumen. El botón de comprobante PDF corresponde a una propuesta de mejora.</p></div>
+    <div class="guia-paso"><span class="n">5</span><p><b>Mis Reservas.</b> La solicitud recién creada aparece con su folio y estado Pendiente.</p></div>
+    <div class="guia-paso"><span class="n">6</span><p><b>Administración.</b> Pulsa "Ver como administrador", abre la fila Pendiente y aprueba o rechaza (funciona con teclado: Tab + Enter).</p></div>
+    <div class="guia-paso"><span class="n">7</span><p><b>Reporte de Ocupación Semanal</b> (salida nueva de esta semana): ábrelo con el botón azul "📑 Reporte de Ocupación" del panel admin.</p></div>
+
+    <button class="primary" style="margin-top:14px;" onclick="cerrarGuia()">Comenzar recorrido</button>
+  </div>
+</div>
+
+<button class="btn-guia-flotante" id="btnGuia" aria-label="Reabrir guía de revisión" title="Guía de revisión" onclick="abrirGuia()">?</button>
+
 <!-- MODAL DETALLE DE RESERVA -->
 <div class="overlay" id="overlayModal">
   <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
@@ -743,6 +777,16 @@
 
     cerrarModal();
     goTo('mis-reservas', 5);
+  }
+
+  /* ===== SEMANA 8: Guía de revisión ===== */
+  function abrirGuia(){
+    document.getElementById('overlayGuia').classList.add('active');
+    document.querySelector('#overlayGuia button.primary').focus();
+  }
+  function cerrarGuia(){
+    document.getElementById('overlayGuia').classList.remove('active');
+    document.getElementById('btnGuia').focus();
   }
 
   document.addEventListener('click', function(e){
